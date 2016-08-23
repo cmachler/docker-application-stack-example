@@ -1,0 +1,1 @@
+# docker-application-stack-example
