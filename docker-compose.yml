@@ -1,0 +1,52 @@
+version: '2'
+
+
+services:
+  db:
+    image: mariadb:latest
+    environment:
+        - MYSQL_ROOT_PASSWORD=P@ssw0rd$$
+        - MYSQL_DATABASE=web_counter
+        - MYSQL_USER=web_counter
+        - MYSQL_PASSWORD=P@ssw0rd!
+    ports:
+        - "3306"
+    volumes:
+        - ./sql:/docker-entrypoint-initdb.d
+    networks:
+      back-tier:
+        aliases:
+          - mariadb
+  
+  web:
+    image: nginx:latest
+    ports:
+        - "8080:80"
+    volumes:
+        - ./code:/code
+        - ./site.conf:/etc/nginx/conf.d/site.conf
+    links:
+        - php
+    networks:
+        - front-tier
+  
+  php:
+    image: evergreenitco/php7-fpm_mysqlcli
+    environment:
+        - MYSQL_DATABASE=web_counter
+        - MYSQL_USER=web_counter
+        - MYSQL_PASSWORD=P@ssw0rd!
+    ports:
+        - "9000"
+    volumes:
+        - ./code:/code
+    links:
+        - db
+    networks:
+        - front-tier
+        - back-tier
+
+networks:
+  front-tier:
+  back-tier:
+
