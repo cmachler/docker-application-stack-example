@@ -2,7 +2,7 @@
 
     // SETUP YOUR COUNTER
         // URL of the folder where script is installed. INCLUDE a trailing "/" !!!
-        $base_url = 'http://counter.www.test.local:8080/counter/';        
+        $base_url = '/counter/';        
                 
         // database parameters
         $username=getenv('MYSQL_USER');
