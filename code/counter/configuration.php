@@ -28,7 +28,7 @@
         
     $con = mysqli_connect($servername,$username,$password,$database);
     if (!$con)
-         die('Cannot dadd comments at the moment');
+         die('Cannot connect to database server');
       else
          $con->select_db($database) or die( "Unable to select database");
          
