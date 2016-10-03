@@ -5,10 +5,10 @@
         $base_url = '/counter/';        
                 
         // database parameters
-        $username=getenv('MYSQL_USER');
-        $password=getenv('MYSQL_PASSWORD');    
-        $servername="mariadb";
-        $database=getenv('MYSQL_DATABASE');
+        $username=getenv('COUNTER_MYSQL_USER');
+        $password=getenv('COUNTER_MYSQL_PASSWORD');    
+        $servername="counter_mariadb";
+        $database=getenv('COUNTER_MYSQL_DATABASE');
         $tableName="countdetail";    
     
     // Optional parameters, if not sure leave with default values

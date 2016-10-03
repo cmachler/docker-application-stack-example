@@ -2,7 +2,7 @@ version: '2'
 
 
 services:
-  db:
+  counter_db:
     image: mariadb:latest
     environment:
         - MYSQL_ROOT_PASSWORD=P@ssw0rd$$
@@ -12,37 +12,71 @@ services:
     ports:
         - "3306"
     volumes:
-        - ./sql:/docker-entrypoint-initdb.d
+        - ./counter_sql:/docker-entrypoint-initdb.d
     networks:
       back-tier:
         aliases:
-          - mariadb
+          - counter_mariadb
+    
+  forum_db:
+    image: postgres:latest
+    environment:
+        - POSTGRES_PASSWORD=P@ssw0rd!
+        - POSTGRES_DB=forum
+        - POSTGRES_USER=forum
+    ports:
+        - "5432"
+    volumes:
+        - ./forum_sql:/docker-entrypoint-initdb.d
+    networks:
+      back-tier:
+        aliases:
+          - forum_mariadb
   
   web:
     image: nginx:latest
     ports:
         - "8080:80"
     volumes:
-        - ./code:/code
+        - ./counter_code:/counter_code
+        - ./forum_code:/forum_code
         - ./nginx.conf:/etc/nginx/nginx.conf
     links:
-        - php
+        - counter_php
+        - forum_python
     networks:
         - front-tier
   
-  php:
+  counter_php:
     image: evergreenitco/php7-fpm_mysqlcli
     environment:
-        - MYSQL_DATABASE=web_counter
-        - MYSQL_USER=web_counter
-        - MYSQL_PASSWORD=P@ssw0rd!
-        - CODE_VERSION=1.0.0
+        - COUNTER_MYSQL_DATABASE=web_counter
+        - COUNTER_MYSQL_USER=web_counter
+        - COUNTER_MYSQL_PASSWORD=P@ssw0rd!
+        - COUNTER_CODE_VERSION=2.0.0
     ports:
         - "9000"
     volumes:
-        - ./code:/code
+        - ./counter_code:/counter_code
     links:
-        - db
+        - counter_db
+    networks:
+        - front-tier
+        - back-tier
+
+  forum_python:
+    image: evergreenitco/python_2.7_psycopg2_bleach:latest
+    command: [ "python", "/forum_code/forum.py" ]
+    environment:
+        - FORUM_POSTGRES_PASSWORD=P@ssw0rd!
+        - FORUM_POSTGRES_DB=forum
+        - FORUM_POSTGRES_USER=forum
+    ports:
+        - "9090"
+    volumes:
+        - ./forum_code:/forum_code
+    links:
+        - forum_db
     networks:
         - front-tier
         - back-tier
